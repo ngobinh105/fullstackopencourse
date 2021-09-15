@@ -3,11 +3,15 @@ import Filter from './components/Filter'
 import PersonForm from './components/PersonForm'
 import Persons from './components/Persons'
 import personService from './services/persons'
+import Notification from './components/Notification'
+
 const App = () => {
   const [persons, setPersons] = useState([])
   const [newName, setNewName] = useState('')
   const [number, setNumber] = useState('')
   const [searchName, setSearchName] = useState('')
+  const [message, setMessage] = useState(null)
+  const [error, setError] = useState(false)
 
   console.log('p', persons)
 
@@ -27,18 +31,37 @@ const App = () => {
         ).id
         personService
           .update(updateId, { name: newName, number: number })
-          .then((updatedPerson) =>
+          .then((updatedPerson) => {
             setPersons(
               persons.map((person) =>
                 person.id === updateId ? updatedPerson : person
               )
             )
-          )
+            setMessage(`${newName} is updated`)
+            setError(false)
+            setTimeout(() => {
+              setMessage(null)
+            }, 5000)
+          })
+          .catch((error) => {
+            setMessage(`'${newName}' was already removed from server`)
+            setTimeout(() => {
+              setMessage(null)
+            }, 5000)
+            setError(true)
+          })
       }
     } else {
       personService
         .create({ name: newName, number: number })
-        .then((newPerson) => setPersons([...persons, newPerson]))
+        .then((newPerson) => {
+          setPersons([...persons, newPerson])
+          setMessage(`${newName} is addded to phonebook`)
+          setError(false)
+          setTimeout(() => {
+            setMessage(null)
+          }, 5000)
+        })
     }
     setNumber('')
     setNewName('')
@@ -51,6 +74,15 @@ const App = () => {
     ) {
       personService.deleteUser(id)
       setPersons(persons.filter((person) => person.id !== id))
+      setMessage(
+        `${
+          persons.find((person) => person.id === id).name
+        } has been successfully removed from the phonebook`
+      )
+      setError(false)
+      setTimeout(() => {
+        setMessage(null)
+      }, 5000)
     }
   }
 
@@ -62,7 +94,8 @@ const App = () => {
   }, [])
   return (
     <div>
-      <h2>Phone book</h2>
+      <h1>Phone book</h1>
+      <Notification message={message} error={error} />
       <Filter searchName={searchName} setSearchName={setSearchName} />
       <h3>Add a new</h3>
       <PersonForm
