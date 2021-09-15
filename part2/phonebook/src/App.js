@@ -1,30 +1,65 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import Filter from './components/Filter'
 import PersonForm from './components/PersonForm'
 import Persons from './components/Persons'
+import personService from './services/persons'
 const App = () => {
-  const [persons, setPersons] = useState([
-    { name: 'Arto Hellas', number: '040-123456', id: 1 },
-    { name: 'Ada Lovelace', number: '39-44-5323523', id: 2 },
-    { name: 'Dan Abramov', number: '12-43-234345', id: 3 },
-    { name: 'Mary Poppendieck', number: '39-23-6423122', id: 4 },
-  ])
+  const [persons, setPersons] = useState([])
   const [newName, setNewName] = useState('')
   const [number, setNumber] = useState('')
   const [searchName, setSearchName] = useState('')
+
+  console.log('p', persons)
 
   const addNewPersons = (e) => {
     e.preventDefault()
     const existed = persons.some(
       (e) => e.name.toLowerCase() === newName.toLowerCase()
     )
-    existed
-      ? alert(`${newName} is already added to phonebook`)
-      : setPersons([...persons, { name: newName, number: number }])
+    if (existed) {
+      if (
+        window.confirm(
+          `${newName} is already added to phonebook, replace the old number with a new one`
+        )
+      ) {
+        const updateId = persons.find(
+          (person) => person.name.toLowerCase() === newName.toLowerCase()
+        ).id
+        personService
+          .update(updateId, { name: newName, number: number })
+          .then((updatedPerson) =>
+            setPersons(
+              persons.map((person) =>
+                person.id === updateId ? updatedPerson : person
+              )
+            )
+          )
+      }
+    } else {
+      personService
+        .create({ name: newName, number: number })
+        .then((newPerson) => setPersons([...persons, newPerson]))
+    }
     setNumber('')
     setNewName('')
   }
+  const onDelete = (id) => {
+    if (
+      window.confirm(
+        `Delete ${persons.find((person) => person.id === id).name}`
+      )
+    ) {
+      personService.deleteUser(id)
+      setPersons(persons.filter((person) => person.id !== id))
+    }
+  }
 
+  useEffect(() => {
+    personService.getAll().then((persons) => {
+      console.log('personsssssss', persons)
+      setPersons(persons)
+    })
+  }, [])
   return (
     <div>
       <h2>Phone book</h2>
@@ -38,7 +73,7 @@ const App = () => {
         setNumber={setNumber}
       />
       <h3>Numbers</h3>
-      <Persons persons={persons} searchName={searchName} />
+      <Persons persons={persons} searchName={searchName} onDelete={onDelete} />
     </div>
   )
 }

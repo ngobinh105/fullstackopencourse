@@ -1,22 +1,18 @@
-const Persons = ({ persons, searchName }) => {
+const Persons = ({ persons, searchName, onDelete }) => {
+  console.log('inside', persons)
   return (
     <div>
       {' '}
-      {searchName !== ''
-        ? persons
-            .filter((person) =>
-              person.name.toLowerCase().includes(searchName.toLowerCase())
-            )
-            .map((person) => (
-              <p key={person.name}>
-                {person.name} {person.number}
-              </p>
-            ))
-        : persons.map((person) => (
-            <p key={person.name}>
-              {person.name} {person.number}
-            </p>
-          ))}
+      {persons
+        .filter((person) =>
+          person.name.toLowerCase().includes(searchName.toLowerCase())
+        )
+        .map((person) => (
+          <p key={person.name}>
+            {person.name} {person.number}{' '}
+            <button onClick={() => onDelete(person.id)}>delete</button>
+          </p>
+        ))}
     </div>
   )
 }
