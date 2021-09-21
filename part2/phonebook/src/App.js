@@ -14,7 +14,6 @@ const App = () => {
   const [error, setError] = useState(false)
 
   console.log('p', persons)
-
   const addNewPersons = (e) => {
     e.preventDefault()
     const existed = persons.some(
@@ -58,6 +57,13 @@ const App = () => {
           setPersons([...persons, newPerson])
           setMessage(`${newName} is addded to phonebook`)
           setError(false)
+          setTimeout(() => {
+            setMessage(null)
+          }, 5000)
+        })
+        .catch((error) => {
+          setMessage(error.response.data.error)
+          setError(true)
           setTimeout(() => {
             setMessage(null)
           }, 5000)

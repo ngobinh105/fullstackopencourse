@@ -1,5 +1,4 @@
 const Persons = ({ persons, searchName, onDelete }) => {
-  console.log('inside', persons)
   return (
     <div>
       {' '}
