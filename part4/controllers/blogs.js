@@ -1,8 +1,12 @@
 const blogRouter = require('express').Router()
 const Blog = require('../models/Blog')
+const User = require('../models/User')
 
 blogRouter.get('/', async (request, response) => {
-  const blogs = await Blog.find({})
+  const blogs = await Blog.find({}).populate('user', {
+    username: 1,
+    name: 1,
+  })
   response.json(blogs)
 })
 
@@ -15,7 +19,23 @@ blogRouter.post('/', async (request, response) => {
     response.status(400).json({ error: 'unknown endpoint' })
     return
   }
-  const res = blog.save()
+
+  if (!blog.user) {
+    const users = await User.find({})
+    blog.user = users[0].id
+  }
+  const res = await blog.save()
+
+  // lay user
+  let userId = blog.user
+  const user = await User.findById(userId)
+  console.log('user', user)
+  //lay blog id
+  const blogId = res.id
+  // gan blog id vo user.blogs
+  user.blogs = [...user.blogs, blogId]
+  await user.save()
+
   response.status(201).json(res)
 })
 
