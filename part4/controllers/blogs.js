@@ -1,6 +1,7 @@
 const blogRouter = require('express').Router()
 const Blog = require('../models/Blog')
 const User = require('../models/User')
+const jwt = require('jsonwebtoken')
 
 blogRouter.get('/', async (request, response) => {
   const blogs = await Blog.find({}).populate('user', {
@@ -11,38 +12,50 @@ blogRouter.get('/', async (request, response) => {
 })
 
 blogRouter.post('/', async (request, response) => {
-  const blog = new Blog(request.body)
+  const body = request.body
+  const decodedToken = jwt.verify(request.token, process.env.SECRET)
+  if (!request.token || !decodedToken.id) {
+    return response.status(401).json({ error: 'token is missing or invalid' })
+  }
+  const user = await User.findById(decodedToken.id)
+  const blog = new Blog({
+    ...body,
+    user: user._id,
+  })
   if (!blog.likes) {
     blog.likes = 0
   }
   if (!blog.title || !blog.url) {
-    response.status(400).json({ error: 'unknown endpoint' })
+    response.status(400).json({ error: 'missing title or url' })
     return
   }
 
-  if (!blog.user) {
-    const users = await User.find({})
-    blog.user = users[0].id
-  }
-  const res = await blog.save()
+  const savedBlog = await blog.save()
 
-  // lay user
-  let userId = blog.user
-  const user = await User.findById(userId)
-  console.log('user', user)
   //lay blog id
-  const blogId = res.id
+  const blogId = savedBlog.id
   // gan blog id vo user.blogs
   user.blogs = [...user.blogs, blogId]
   await user.save()
 
-  response.status(201).json(res)
+  response.status(201).json(savedBlog)
 })
 
 blogRouter.delete('/:id', async (request, response, next) => {
+  const decodedToken = jwt.verify(request.token, process.env.SECRET)
+  const blog = await Blog.findById(request.params.id)
+  const user = await User.findById(decodedToken.id)
   try {
-    await Blog.findByIdAndRemove(request.params.id)
-    response.status(204).end()
+    if (blog.user.toString() === decodedToken.id.toString()) {
+      await Blog.findByIdAndRemove(request.params.id)
+      console.log('user', user)
+      user.blogs = user.blogs.filter(
+        (id) => id.toString() !== request.params.id.toString()
+      )
+      await user.save()
+      response.status(204).end()
+    } else
+      return response.status(401).json({ error: 'wrong token authentication' })
   } catch (error) {
     next(error)
   }
