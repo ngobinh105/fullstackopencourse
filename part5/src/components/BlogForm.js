@@ -35,5 +35,6 @@ const BlogForm = forwardRef(({ onSubmit }, ref) => {
     </div>
   )
 })
+BlogForm.displayName = 'Blog Form'
 
 export default BlogForm

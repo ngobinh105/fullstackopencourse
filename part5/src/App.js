@@ -118,7 +118,7 @@ const App = () => {
             </p>
           </div>
 
-          <Togglable buttonLabel='create new blog' ref={togglableRef}>
+          <Togglable buttonLabel='create a new blog' ref={togglableRef}>
             <BlogForm
               onSubmit={(e) => {
                 e.preventDefault()
