@@ -1,6 +1,6 @@
 import React, { useState, useImperativeHandle, forwardRef } from 'react'
 
-const BlogForm = forwardRef(({ onSubmit }, ref) => {
+const BlogForm = forwardRef(({ handleNewBlog }, ref) => {
   const [title, setTitle] = useState('')
   const [author, setAuthor] = useState('')
   const [url, setUrl] = useState('')
@@ -9,12 +9,22 @@ const BlogForm = forwardRef(({ onSubmit }, ref) => {
     return { title, author, url, setTitle, setAuthor, setUrl }
   })
   return (
-    <div>
+    <div className='formDiv'>
       <h2>Create a new blog</h2>
-      <form onSubmit={onSubmit}>
+      <form
+        onSubmit={(e) => {
+          e.preventDefault()
+          handleNewBlog({
+            title,
+            author,
+            url,
+          })
+        }}
+      >
         <div>
           title
           <input
+            id='title'
             value={title}
             onChange={(e) => setTitle(e.target.value)}
           ></input>
@@ -22,15 +32,22 @@ const BlogForm = forwardRef(({ onSubmit }, ref) => {
         <div>
           author
           <input
+            id='author'
             value={author}
             onChange={(e) => setAuthor(e.target.value)}
           ></input>
         </div>
         <div>
           url
-          <input value={url} onChange={(e) => setUrl(e.target.value)}></input>
+          <input
+            id='url'
+            value={url}
+            onChange={(e) => setUrl(e.target.value)}
+          ></input>
         </div>
-        <button type='submit'>create</button>
+        <button id='create-button' type='submit'>
+          create
+        </button>
       </form>
     </div>
   )

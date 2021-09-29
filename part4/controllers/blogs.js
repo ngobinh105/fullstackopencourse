@@ -32,14 +32,16 @@ blogRouter.post('/', async (request, response) => {
   }
 
   const savedBlog = await blog.save()
-
-  //lay blog id
   const blogId = savedBlog.id
-  // gan blog id vo user.blogs
   user.blogs = [...user.blogs, blogId]
   await user.save()
 
-  response.status(201).json(savedBlog)
+  response.status(201).json(
+    await savedBlog.populate('user', {
+      username: 1,
+      name: 1,
+    })
+  )
 })
 
 blogRouter.delete('/:id', async (request, response, next) => {

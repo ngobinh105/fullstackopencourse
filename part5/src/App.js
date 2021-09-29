@@ -43,11 +43,15 @@ const App = () => {
   }
   const handleNewBlog = async (newBlog) => {
     const addedBlog = await blogService.create(newBlog)
+
     blogFormRef.current.setTitle('')
     blogFormRef.current.setAuthor('')
     blogFormRef.current.setUrl('')
+
     setBlogs([...blogs, addedBlog])
-    togglableRef.current.toggleVisibility()
+    if (togglableRef && togglableRef.current) {
+      togglableRef.current.toggleVisibility()
+    }
     setMessage(
       `a new blog ${blogFormRef.current.title} by ${blogFormRef.current.author} added`
     )
@@ -90,6 +94,7 @@ const App = () => {
           <div>
             username
             <input
+              id='username'
               value={username}
               name='Username'
               onChange={(e) => setUsername(e.target.value)}
@@ -98,13 +103,16 @@ const App = () => {
           <div>
             password
             <input
+              id='password'
               value={password}
               type='password'
               name='Password'
               onChange={(e) => setPassword(e.target.value)}
             ></input>
           </div>
-          <button type='submit'>login</button>
+          <button id='login-button' type='submit'>
+            login
+          </button>
         </form>
       )}
       {user !== null && (
@@ -113,23 +121,15 @@ const App = () => {
             <p>
               <span>{user.name} is logged in</span>
               <span>
-                <button onClick={() => handleLogout()}>log out</button>
+                <button id='logout-button' onClick={() => handleLogout()}>
+                  log out
+                </button>
               </span>
             </p>
           </div>
 
           <Togglable buttonLabel='create a new blog' ref={togglableRef}>
-            <BlogForm
-              onSubmit={(e) => {
-                e.preventDefault()
-                handleNewBlog({
-                  title: blogFormRef.current.title,
-                  author: blogFormRef.current.author,
-                  url: blogFormRef.current.url,
-                })
-              }}
-              ref={blogFormRef}
-            />
+            <BlogForm handleNewBlog={handleNewBlog} ref={blogFormRef} />
           </Togglable>
           <br></br>
           <div>
