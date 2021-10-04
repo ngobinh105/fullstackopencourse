@@ -1,5 +1,5 @@
 const initialState = null
-const delay = (ms) => new Promise((res) => setTimeout(res, ms))
+let timerId
 
 const notificationReducer = (state = initialState, action) => {
   switch (action.type) {
@@ -14,15 +14,19 @@ const notificationReducer = (state = initialState, action) => {
 
 export const setNotification = (message, time) => {
   return async (dispatch) => {
+    if (timerId) {
+      clearTimeout(timerId)
+    }
     dispatch({
       type: 'SET_NOTIFICATION',
       payload: message,
     })
-    await delay(time * 1000)
-    dispatch({
-      type: 'SET_NOTIFICATION',
-      payload: null,
-    })
+    timerId = setTimeout(() => {
+      dispatch({
+        type: 'SET_NOTIFICATION',
+        payload: null,
+      })
+    }, time * 1000)
   }
 }
 
