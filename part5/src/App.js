@@ -23,6 +23,12 @@ import {
 } from './redux/actions/blogActions'
 import { initializeUser } from './redux/actions/userReducer'
 import { BrowserRouter as Router, Route, Switch, Link } from 'react-router-dom'
+import AppBar from '@mui/material/AppBar'
+import Box from '@mui/material/Box'
+import Toolbar from '@mui/material/Toolbar'
+import Typography from '@mui/material/Typography'
+import Button from '@mui/material/Button'
+import TextField from '@mui/material/TextField'
 
 const App = () => {
   // const [blogs, setBlogs] = useState([])
@@ -38,8 +44,7 @@ const App = () => {
   const blogs = useSelector((state) => state.blogs)
   const users = useSelector((state) => state.users)
   const padding = { padding: 5 }
-  const handleLogin = async (event) => {
-    event.preventDefault()
+  const handleLogin = async () => {
     try {
       // const user = await loginService.login({
       //   username,
@@ -62,7 +67,6 @@ const App = () => {
       //   setMessage(null)
       //   setError(false)
       // }, 5000)
-      console.log('error', error)
       dispatch(setErrorMessage(error.response.data.error))
       setTimeout(() => {
         dispatch(resetMessage())
@@ -151,72 +155,117 @@ const App = () => {
       <div>
         <Notification />
         {/* <Notification message={message} error={error} /> */}
-        {!userInfo.token && (
-          <form onSubmit={handleLogin}>
-            <div>
-              username
-              <input id='username' {...username}></input>
-            </div>
-            <div>
-              password
-              <input id='password' {...password}></input>
-            </div>
-            <button id='login-button' type='submit'>
-              login
-            </button>
-          </form>
-        )}
-        {userInfo.token && (
-          <div>
-            <div style={{ backgroundColor: 'AliceBlue' }}>
-              <Link style={padding} to='/'>
-                blogs
-              </Link>
-              <Link style={padding} to='/users'>
-                users
-              </Link>
 
-              <span style={padding}>{userInfo.name} is logged in</span>
-              <span style={padding}>
-                <button id='logout-button' onClick={() => handleLogout()}>
-                  log out
-                </button>
-              </span>
-            </div>
-            <h2>blog app</h2>
-            <Switch>
-              <Route path='/users/:id'>
-                <User users={users} blogs={blogs} />
-              </Route>
-              <Route path='/blogs/:id'>
-                <Blog blogs={blogs} handleLike={handleLike} />
-              </Route>
-              <Route path='/users'>
-                <Users users={users} />
-              </Route>
+        <Box sx={{ flexGrow: 1 }}>
+          <AppBar position='static' color='transparent'>
+            <Toolbar>
+              <Typography sx={{ flexGrow: 1 }}>
+                <Link
+                  style={{
+                    ...padding,
 
-              <Route path='/'>
-                <Togglable buttonLabel='create a new blog' ref={togglableRef}>
-                  <BlogForm handleNewBlog={handleNewBlog} ref={blogFormRef} />
-                </Togglable>
-                <br></br>
-                <div>
-                  {blogs
-                    .sort((a, b) => b.likes - a.likes)
-                    .map((blog) => (
-                      <Blogs
-                        key={blog.id}
-                        blog={blog}
-                        handleLike={handleLike}
-                        handleDelete={handleDelete}
-                        user={userInfo}
-                      />
-                    ))}
-                </div>
-              </Route>
-            </Switch>
-          </div>
-        )}
+                    textDecoration: 'none',
+                  }}
+                  to='/'
+                >
+                  Blogs
+                </Link>
+                <Link
+                  style={{
+                    ...padding,
+
+                    textDecoration: 'none',
+                  }}
+                  to='/users'
+                >
+                  Users
+                </Link>
+              </Typography>
+              {userInfo.token ? (
+                <>
+                  <span style={{ ...padding }}>{userInfo.name}</span>
+                  <span style={{ ...padding }}>
+                    <Button
+                      variant='contained'
+                      color='success'
+                      id='logout-button'
+                      onClick={() => handleLogout()}
+                    >
+                      log out
+                    </Button>
+                  </span>
+                </>
+              ) : (
+                <>
+                  <TextField
+                    size='small'
+                    label='username'
+                    margin='dense'
+                    variant='outlined'
+                    color='primary'
+                    id='username'
+                    {...username}
+                  ></TextField>
+                  <TextField
+                    sx={{ marginLeft: '5px' }}
+                    size='small'
+                    label='password'
+                    margin='dense'
+                    variant='outlined'
+                    color='primary'
+                    id='password'
+                    {...password}
+                  ></TextField>
+                  <Button
+                    variant='contained'
+                    color='success'
+                    sx={{ height: 40, marginTop: '3px', marginLeft: '5px' }}
+                    id='login-button'
+                    onClick={() => {
+                      handleLogin()
+                    }}
+                  >
+                    Log in
+                  </Button>
+                </>
+              )}
+            </Toolbar>
+          </AppBar>
+        </Box>
+        <div>
+          <h2>BLOG APP</h2>
+          <Switch>
+            <Route path='/users/:id'>
+              <User users={users} blogs={blogs} />
+            </Route>
+            <Route path='/blogs/:id'>
+              <Blog blogs={blogs} handleLike={handleLike} />
+            </Route>
+            <Route path='/users'>
+              <Users users={users} />
+            </Route>
+
+            <Route path='/'>
+              <Togglable buttonLabel='create a new blog' ref={togglableRef}>
+                <BlogForm handleNewBlog={handleNewBlog} ref={blogFormRef} />
+              </Togglable>
+              <br></br>
+              <div>
+                {blogs
+                  .sort((a, b) => b.likes - a.likes)
+                  .map((blog) => (
+                    <Blogs
+                      key={blog.id}
+                      blog={blog}
+                      handleLike={handleLike}
+                      handleDelete={handleDelete}
+                      user={userInfo}
+                    />
+                  ))}
+              </div>
+            </Route>
+          </Switch>
+        </div>
       </div>
     </Router>
   )
