@@ -155,7 +155,11 @@ const resolvers = {
       authors = authors.map((author) =>
         author.name === args.name ? updatedAuthor : author
       )
-      return updatedAuthor
+      return {
+        ...updatedAuthor,
+        bookCount: books.filter((book) => book.author === updatedAuthor.name)
+          .length,
+      }
     },
   },
 }
