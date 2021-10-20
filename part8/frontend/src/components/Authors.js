@@ -20,6 +20,7 @@ const Authors = (props) => {
   if (result.loading) {
     return <div>loading...</div>
   }
+  console.log('result', result.data.allAuthors)
   const authors = result.data.allAuthors
 
   const options = authors.map((author) => ({

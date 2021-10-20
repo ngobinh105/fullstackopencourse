@@ -121,7 +121,7 @@ const typeDefs = gql`
   }
   type Author {
     name: String!
-    id: String!
+    id: ID
     born: Int
     bookCount: Int
   }
@@ -151,6 +151,7 @@ const resolvers = {
     bookCount: () => Book.collection.countDocuments(),
     allBooks: async (root, args) => {
       const books = await Book.find({}).populate('author')
+      // console.log('books', books)
       return books.filter((book) => {
         if (args.author && args.genre) {
           return (
@@ -170,11 +171,16 @@ const resolvers = {
     allAuthors: async () => {
       const authors = await Author.find({})
       const books = await Book.find({}).populate('author')
-      const allAuthors = authors.map((author) => ({
-        ...author.toObject(),
-        bookCount: books.filter((book) => book.author.name === author.name)
-          .length,
-      }))
+      const allAuthors = authors.map((author) => {
+        // console.log('author', author)
+        return {
+          ...author.toObject(),
+          id: author._id.toString(),
+          bookCount: books.filter((book) => book.author.name === author.name)
+            .length,
+        }
+      })
+      console.log('allauthors', allAuthors)
 
       return allAuthors
     },
@@ -269,7 +275,7 @@ const server = new ApolloServer({
   typeDefs,
   resolvers,
   context: async ({ req }) => {
-    const auth = req ? req.headers.authorization : null
+    const auth = req ? req.headers.authentication : null
     if (auth && auth.toLowerCase().startsWith('bearer ')) {
       const decodedToken = jwt.verify(auth.substring(7), JWT_SECRET)
       const currentUser = await User.findById(decodedToken.id)
