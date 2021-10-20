@@ -10,9 +10,9 @@ const Book = require('./models/Book')
 const User = require('./models/User')
 const mongoose = require('mongoose')
 const jwt = require('jsonwebtoken')
+require('dotenv').config()
 
-const MONGODB_URI =
-  'mongodb+srv://ngobinh:tWVdrQSPgrnFIRV8@cluster0.hzqrr.mongodb.net/book-app?retryWrites=true&w=majority'
+const MONGODB_URI = process.env.MONGO_DB
 
 console.log('connecting to', MONGODB_URI)
 
