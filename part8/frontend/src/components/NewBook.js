@@ -12,6 +12,10 @@ const NewBook = (props) => {
     onError: (error) => {
       props.setError(error.graphQLErrors[0].message)
     },
+    // update: (store, response) => {
+    //   props.updateCacheWith(response.data.addBook)
+    //   console.log('watch me 456')
+    // },
     refetchQueries: [{ query: ALL_BOOKS }, { query: ALL_AUTHORS }],
   })
 
@@ -24,7 +28,6 @@ const NewBook = (props) => {
     createBook({
       variables: { title, author, published: Number(published), genres },
     })
-    console.log('add book...')
 
     setTitle('')
     setPublished('')
