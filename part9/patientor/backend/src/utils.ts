@@ -40,6 +40,12 @@ const parseOccupation = (occupation: unknown): string => {
   }
   return occupation
 }
+const parseEntries = (entries: unknown): string[] => {
+  if (!entries || !Array.isArray(entries)) {
+    throw new Error('Invalid or missing entries: ' + entries)
+  }
+  return entries
+}
 
 type Fields = {
   name: unknown
@@ -47,6 +53,7 @@ type Fields = {
   ssn: unknown
   gender: unknown
   occupation: unknown
+  entries: unknown
 }
 const toNewPatientEntry = ({
   name,
@@ -54,6 +61,7 @@ const toNewPatientEntry = ({
   ssn,
   gender,
   occupation,
+  entries,
 }: Fields): NewPatientEntry => {
   const newEntry: NewPatientEntry = {
     name: parseName(name),
@@ -61,6 +69,7 @@ const toNewPatientEntry = ({
     ssn: parseSSN(ssn),
     gender: parseGender(gender),
     occupation: parseOccupation(occupation),
+    entries: parseEntries(entries),
   }
   return newEntry
 }

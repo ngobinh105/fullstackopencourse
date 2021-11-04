@@ -33,12 +33,16 @@ const addEntry = (entry: NewPatientEntry): PatientEntry => {
     id: id,
     ...entry,
   }
-  patientData.push(newPatientEntry)
+  patientEntries.push(newPatientEntry)
   return newPatientEntry
 }
-
+const findById = (id: string): PatientEntry | undefined => {
+  const patient = patientEntries.find((p) => p.id === id)
+  return patient
+}
 export default {
   getEntries,
   addEntry,
   getNonSensitiveEntries,
+  findById,
 }
