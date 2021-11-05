@@ -1,4 +1,4 @@
-import { Gender, NewPatientEntry } from './types'
+import { Gender, NewPatientEntry, Entry } from './types'
 
 const isString = (text: unknown): text is string => {
   return typeof text === 'string' || text instanceof String
@@ -40,7 +40,7 @@ const parseOccupation = (occupation: unknown): string => {
   }
   return occupation
 }
-const parseEntries = (entries: unknown): string[] => {
+const parseEntries = (entries: unknown): Entry[] => {
   if (!entries || !Array.isArray(entries)) {
     throw new Error('Invalid or missing entries: ' + entries)
   }
