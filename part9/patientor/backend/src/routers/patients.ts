@@ -28,5 +28,16 @@ router.get('/:id', (req, res) => {
     res.sendStatus(404)
   }
 })
+router.post('/:id/entries', (req, res) => {
+  try {
+    const patientWithNewEntry = patientService.addNewPatientEntry(
+      req.params.id,
+      req.body
+    )
+    res.send(patientWithNewEntry)
+  } catch (error) {
+    res.sendStatus(400)
+  }
+})
 
 export default router
